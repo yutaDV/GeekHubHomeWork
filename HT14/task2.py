@@ -58,12 +58,11 @@ def choices_currency():
 	menu = {
 		'USD':	'долар США', 'EUR':	'євро',
 		'CHF':	'швейцарський франк', 'GBP': 'британський фунт',
-		'PLZ':	'польський злотий', 'SEK':	'шведська крона',
-		'CAD':	'канадський долар'
+		'SEK':	'шведська крона', 'CAD': 'канадський долар'
 	}
 	print('\n Для обрання валюти вкажіть:')
 	for key, value in menu.items():
-		time.sleep(1)
+		#time.sleep(1)
 		print(f'  {key} - {value}')
 	while True:
 		time.sleep(1)
@@ -80,12 +79,13 @@ def correct_date():
 		date = input('Введіть дату у форматі дд.мм.рррр (приклад - 01.01.2016) не раніше 01.01.2015: \n')
 		try:
 			valid_date = datetime.strptime(date, '%m.%d.%Y')
-			if not (datetime(2015, 1, 1) <= valid_date < datetime.now()):
-				print('Не коректно введена дата спробуйте знову (не раніше 01.01.2015)')
 		except ValueError:
 			print('Не коректно введена дата спробуйте знову !')
 		else:
-			break
+			if (datetime(2015, 1, 1) <= valid_date < datetime.now()):
+				break
+			else:
+				print('Не коректно введена дата спробуйте знову (не раніше 01.01.2015)')
 	return date
 
 
