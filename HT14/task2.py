@@ -6,13 +6,13 @@
 
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 
 
 class Currency:
-	"""Клас пвертає курс вказаної валюти на вказану дату почитаючи з 01.01.2015р."""
+	""" Клас пвертає курс вказаної валюти на вказану дату почитаючи з 01.01.2015р."""
 	base_url = 'https://api.privatbank.ua/p24api/exchange_rates?json&date='
 
 	def __init__(self, date, currency):
@@ -62,7 +62,7 @@ def choices_currency():
 	}
 	print('\n Для обрання валюти вкажіть:')
 	for key, value in menu.items():
-		#time.sleep(1)
+		time.sleep(1)
 		print(f'  {key} - {value}')
 	while True:
 		time.sleep(1)
@@ -78,7 +78,7 @@ def correct_date():
 	while True:
 		date = input('Введіть дату у форматі дд.мм.рррр (приклад - 01.01.2016) не раніше 01.01.2015: \n')
 		try:
-			valid_date = datetime.strptime(date, '%m.%d.%Y')
+			valid_date = datetime.strptime(date, '%d.%m.%Y')
 		except ValueError:
 			print('Не коректно введена дата спробуйте знову !')
 		else:
@@ -89,7 +89,32 @@ def correct_date():
 	return date
 
 
-if __name__ == '__main__':
+def correct_period(date_start, date_stop):
+	"""Функція перевіряє чи коректно ввказано період від меншої дати до більшої"""
+
+	valid_date_start = datetime.strptime(date_start, '%d.%m.%Y')
+	valid_date_stop = datetime.strptime(date_stop, '%d.%m.%Y')
+	if valid_date_start < valid_date_stop:
+		return True
+	return False
+
+
+def list_of_dates(date_start, date_stop):
+	"""Функція перевіряє список з датами за які потрібно переглянути курси валют"""
+
+	valid_date_start = datetime.strptime(date_start, '%d.%m.%Y')
+	valid_date_stop = datetime.strptime(date_stop, '%d.%m.%Y')
+	list_of_dates = []
+	delta = timedelta(days=1)
+	while valid_date_start <= valid_date_stop:
+		list_of_dates.append(f'{valid_date_start.strftime("%d.%m.%Y")}')
+		valid_date_start += delta
+	return list_of_dates
+
+
+def one_date():
+	"""Функція виконується, якщо користувач бажає переглянути курс валют за одну дату"""
+
 	while True:
 		currency = choices_currency()
 		break
@@ -100,3 +125,41 @@ if __name__ == '__main__':
 	base = course_start.get_currency()
 	element = course_start.return_base(base)
 	print(course_start.return_result(element))
+
+
+def period():
+	"""Функція виконується, якщо користувач бажає переглянути курс валют за певний період"""
+
+	while True:
+		currency = choices_currency()
+		break
+	while True:
+		print('Введіть почактову дату')
+		start_date = correct_date()
+		print('Введіть кінцеву дату')
+		stop_date = correct_date()
+		if correct_period(start_date, stop_date):
+			break
+		else:
+			print('Не коректно введена дати спробуйте знову')
+	dates = list_of_dates(start_date, stop_date)
+	for date in dates:
+		course_start = Currency(date, currency)
+		base = course_start.get_currency()
+		element = course_start.return_base(base)
+		print(course_start.return_result(element))
+
+
+if __name__ == '__main__':
+
+	while True:
+		print('Щоб дізнатись курс за одну дату введіть 1, щоб дізнатись за період вкажіть 2')
+		answer = input('Введіть цифру що відповідє запиту (1 або 2) - ')
+		if answer == '1':
+			one_date()
+			break
+		if answer == '2':
+			period()
+			break
+		else:
+			print('Не коректно введена дати спробуйте знову')
